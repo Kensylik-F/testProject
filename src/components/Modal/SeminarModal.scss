@@ -1,0 +1,69 @@
+.modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: white;
+	padding: 20px;
+	border-radius: 8px;
+	width: 90%;
+	max-width: 500px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+
+	button {
+	padding: 10px 15px;
+	margin-right: 10px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+  	}
+  
+  button:hover {
+	background-color: #0056b3;
+  }
+  
+  button:disabled {
+	background-color: grey;
+	cursor: not-allowed;
+  }
+  
+  img {
+	max-width: 100%;
+	max-height: 300px;
+	border-radius: 8px;
+	margin: 10px;
+  }
+  
+  }
+  
+  .title {
+	font-size: 24px;
+	margin-bottom: 15px;
+	color: #333;
+  }
+  input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
+	background-color: #f0f8ff;
+  }
+  
+  input[type="text"], input[type="date"], textarea {
+	display: block;
+	width: 100%;
+	padding: 10px;
+	margin: 10px 0;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	transition: border-color 0.3s;
+  }
+  
+  input[type="text"].filled, input[type="date"].filled, textarea.filled {
+	border-color: blue;
+  }
+  
+  input[type="text"].error, input[type="date"].error, textarea.error {
+	border-color: red;
+  }
+  
