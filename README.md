@@ -28,12 +28,9 @@ npm install
 ### Шаг 3: Запустите сервер разработки
 ---
 
-1. **Запустите сервер разработки React:**
-    ```bash
-    npm start
-    ```
-2. **Запустите сервер json-server**
-    ```bash
-    npm run json-server
-    ```
+**Запустите react приложение и API-сервер json-server:**
+```bash
+npm start
+```
+
 ### Шаг 4: Откройте приложение
