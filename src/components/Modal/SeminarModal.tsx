@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Modal from 'react-modal'
 import { updateFetch } from "../../api/api";
 import './SeminarModal.scss'
-
+import { useForm } from 'react-hook-form'
 
 interface ISeminar {
 	id: number;
@@ -22,64 +22,40 @@ Modal.setAppElement('#root')
 
 export const SeminarModal: React.FC<IModalProps> = ({seminar,isOpen, onUpdate, onClose}) =>{
 
-	const [formData, setFormData] = useState(seminar)
-	const [previewImg, setPreviewImg] = useState<string | null>(seminar.photo)
+	const {register,watch,setValue,reset ,formState:{errors, isValid}, handleSubmit } = useForm<ISeminar>({
+		defaultValues: seminar,
+		mode: 'onChange'
+	})
 	
-	// блокируем страницу при открытом модальном окне
 	useEffect(() => {
 		if (isOpen) {
+			reset(seminar)
 		  document.body.style.overflow = 'hidden';
 		} else {
 		  document.body.style.overflow = 'auto';
 		}
-	  
 		return () => {
 		  document.body.style.overflow = 'auto';
 		};
-	}, [isOpen]);
+	}, [isOpen,seminar,reset]);
 	
-	// преобразование формата отображения даты
-	useEffect(() => {
-		if (seminar.date) {
-			const parsedDate = Date.parse(seminar.date) ? seminar.date : null;
-			if (parsedDate) {
-				setFormData(prev => ({
-					...prev,
-					date: new Date(parsedDate).toISOString().substring(0, 10),
-				}));
-			}
-		}
-	}, [seminar.date]);
-	
-	const isFormValid = formData.title.trim() && formData.date.trim() && formData.description.trim();
-	
-	// обновляет данные формы
-	const handleEdit = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { value, name } = e.target;
-		setFormData(prev => ({ ...prev, [name]: value }));
-	  }, []);
 	// обрабатывает загрузку изображения, переобразуя файл в строку
 	const handleEditImg = (e: React.ChangeEvent<HTMLInputElement>) =>{
 		const file = e.target.files?.[0]
 		if(file){
 			const reader = new FileReader()
 			reader.onload = () =>{
-				setPreviewImg(reader.result as string)
-				setFormData(prev => ({...prev, photo: reader.result as string}))
+				setValue('photo',reader.result as string)
 			}
-
 			reader.readAsDataURL(file)
 		}
 	}
 
-	// сохраняет данные 
-	const handleSave = async() =>{
+	const onSubmit = async (data: ISeminar) =>{
 		try{
 			const formatedDate = {
-				...formData,
-				date: formData.date.split('-').reverse().join('.')
-			}
-			const updateSeminar = await updateFetch(formatedDate, formData.id)
+				...data, date: data.date.split('-').reverse().join('.')}
+			const updateSeminar = await updateFetch(formatedDate, seminar.id)
 			if(updateSeminar){
 				onUpdate(updateSeminar)
 				onClose()
@@ -89,62 +65,67 @@ export const SeminarModal: React.FC<IModalProps> = ({seminar,isOpen, onUpdate, o
 			alert('Не удалось сохранить изменения! Повторите попытку.')
 		}
 	}
-	// возвращает класс для стилизации
-	const getClassForInput = (value: string) => {
-		return value.trim() ? "filled" : "error";
+	const getClassForInput = (value: keyof ISeminar) => {
+		return errors[value] ? "error" : watch(value) ? 'filled' : '';
 	  };
-
 	return(
 		<Modal
 			className='modal'
 			isOpen={isOpen}
 			onRequestClose={onClose}
 			contentLabel="edit seminar"
-		>
-			<h2 className="title">Edit Seminar</h2>
-			<input 
-				type="text"
-				name="title"
-				value={formData.title} 
-				placeholder="title"
-				onChange={handleEdit}
-				className={getClassForInput(formData.title)}
-			/>
-			<input 
-				type="date" 
-				name="date"
-				value={formData.date}
-				onChange={handleEdit}
-				className={getClassForInput(formData.date)}
-			/>
-			<textarea
-				name="description"
-				value={formData.description}
-				placeholder="description"
-				onChange={handleEdit}
-				className={getClassForInput(formData.description)}
-			/>
-			<div>
-				<label>Upload image</label>
+		> 
+			<form onSubmit={handleSubmit(onSubmit)}>
+				<h2 className="title">Edit Seminar</h2>
 				<input 
-					type="file" 
-					onChange={handleEditImg} 
-					accept="image/*"/>
+					{...register('title', {
+						required: 'Заполните поле',
+						minLength:{
+							value: 0,
+							message: 'Поле не может быть пустым'
+						}
+					})}
+					type="text"
+					placeholder="title"
+					className={getClassForInput('title')}
+				/>
+				{errors.title && <div className="MessegeError">{errors.title.message}</div>}
+				<input 
+					type="date" 
+					{...register('date', {required: 'введите дату'})}
+					className={getClassForInput('title')}
+				/>
+				{errors.date && <div className="MessegeError">{errors.date.message}</div>}
+				<textarea
+					{...register('description', {required: 'введите описание'})}
+					placeholder="description"
+					className={getClassForInput('description')}
+				/>
+				{errors.description && <div className="MessegeError">{errors.description.message}</div>}
+				<div>
+					<label>Upload image</label>
+					<input 
+						type="file" 
+						{...register('photo',)}
+						onChange={handleEditImg} 
+						accept="image/*"/>
 
-				{
-					previewImg &&(
-						<img 
-							src={previewImg} 
-							alt=""
-							style={{ width: '100%', maxWidth: '300px', marginTop: '10px', borderRadius: '8px' }} 
-							 />
-					)
-				}
-			</div>
-			<div>
-				<button onClick={onClose}>cancel</button>
-				<button onClick={handleSave} disabled={!isFormValid}>save</button>
-			</div>
+					{
+						watch('photo') &&(
+							<img 
+								src={watch('photo')} 
+								alt=""
+								style={{ width: '100%', maxWidth: '300px', marginTop: '10px', borderRadius: '8px' }} 
+								 />
+						)
+					}
+				</div>
+				<div>
+					<button onClick={onClose}>cancel</button>
+					<button type="submit" disabled={!isValid}>save</button>
+				</div>
+			</form>
+
 		</Modal>
 	)
 

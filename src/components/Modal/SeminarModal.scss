@@ -45,25 +45,39 @@
 	margin-bottom: 15px;
 	color: #333;
   }
-  input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
-	background-color: #f0f8ff;
-  }
-  
-  input[type="text"], input[type="date"], textarea {
-	display: block;
-	width: 100%;
-	padding: 10px;
-	margin: 10px 0;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	transition: border-color 0.3s;
-  }
-  
-  input[type="text"].filled, input[type="date"].filled, textarea.filled {
-	border-color: blue;
-  }
-  
-  input[type="text"].error, input[type="date"].error, textarea.error {
-	border-color: red;
-  }
-  
+  .MessegeError{
+	color:red
+	}
+	textarea:focus{
+		outline: none;
+
+	}
+	input[type="text"]:focus,
+	input[type="date"]:focus,
+	textarea:focus {
+	  background-color: #f0f8ff;
+	  border-color: blue !important;
+	}
+	
+	input[type="text"],
+	input[type="date"],
+	textarea {
+	  display: block;
+	  width: 100%;
+	  padding: 10px;
+	  margin: 10px 0;
+	  border: 1px solid #ccc;
+	  border-radius: 4px;
+	  transition: border-color 0.3s;
+	}
+	
+	input.filled,
+	textarea.filled {
+	  border-color: blue;
+	}
+	
+	input.error,
+	textarea.error {
+	  border-color: red !important;
+	}
+	
